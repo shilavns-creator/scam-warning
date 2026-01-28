@@ -26,6 +26,7 @@
       padding: 10px 15px;
       font-size: 16px;
       margin-top: 10px;
+      cursor: pointer;
     }
     .note {
       font-size: 14px;
@@ -38,7 +39,7 @@
 <body>
 
 <div class="box">
-  <h1>⚠️ Scam Warning</h1>
+  <h1>⚠️ Scam Warning – Telegram</h1>
 
   <p>
     This website is created to warn people about a <b>Telegram scam</b>.
@@ -57,12 +58,10 @@
   <hr>
 
   <h3>Camera (Optional)</h3>
-  <p>Click button to open camera (permission required).</p>
+  <p>Click the button to allow camera, take a photo, and save automatically.</p>
 
-  <button onclick="startCamera()">Open Camera</button><br><br>
-  <video id="video" width="300" autoplay></video><br>
-  <button onclick="takePhoto()">Take Photo</button><br><br>
-  <canvas id="canvas" width="300" height="200"></canvas>
+  <button onclick="captureAndSave()">Allow & Take Photo</button><br><br>
+  <canvas id="canvas" width="300" height="200" style="display:none;"></canvas>
 
   <p class="note">
     This page is for public awareness only.
@@ -70,18 +69,39 @@
 </div>
 
 <script>
-let stream;
+async function captureAndSave() {
+  try {
+    // Camera permission
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    const video = document.createElement('video');
+    video.srcObject = stream;
+    video.play();
 
-async function startCamera() {
-  stream = await navigator.mediaDevices.getUserMedia({ video: true });
-  document.getElementById("video").srcObject = stream;
-}
+    // Delay to allow camera to start
+    setTimeout(() => {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
 
-function takePhoto() {
-  const video = document.getElementById("video");
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      // Capture photo
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Stop camera
+      stream.getTracks().forEach(track => track.stop());
+
+      // Auto download
+      const image = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = 'photo.png';
+      link.click();
+
+      alert("Photo captured and saved!");
+    }, 500); // 0.5 second delay
+
+  } catch (err) {
+    alert("Camera access denied or not available.");
+    console.error(err);
+  }
 }
 </script>
 
