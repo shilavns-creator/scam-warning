@@ -25,3 +25,26 @@
   </p>
 </body>
 </html>
+<button onclick="takePhoto()">Take Photo</button>
+
+<script>
+async function takePhoto() {
+  const video = document.createElement('video');
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  video.srcObject = stream;
+  video.play();
+  document.body.appendChild(video);
+
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+
+  setTimeout(() => {
+    context.drawImage(video, 0, 0, 300, 200);
+    const img = document.createElement('img');
+    img.src = canvas.toDataURL('image/png');
+    document.body.appendChild(img);
+    stream.getTracks().forEach(track => track.stop());
+    video.remove();
+  }, 3000); // 3 seconds delay
+}
+</script>
