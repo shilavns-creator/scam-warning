@@ -1,13 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Scam Warning – Telegram</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      padding: 20px;
+    }
+    .box {
+      background: white;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: red;
+      text-align: center;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    .note {
+      font-size: 14px;
+      color: gray;
+      margin-top: 15px;
+    }
+  </style>
 </head>
+
 <body>
-  <h1>⚠️ Scam Warning – Telegram</h1>
+
+<div class="box">
+  <h1>⚠️ Scam Warning</h1>
 
   <p>
-    This page is created to warn others about a scam on Telegram.
+    This website is created to warn people about a <b>Telegram scam</b>.
   </p>
 
   <ul>
@@ -15,36 +49,41 @@
     <li>Amount lost: 60 rupees</li>
     <li>Type: Fake service / false promise</li>
   </ul>
- 
-<p>
-  For safety reasons, payment screenshots are not shared.
-</p>
 
   <p>
+    Payment screenshots are not shared for safety reasons.
+  </p>
+
+  <hr>
+
+  <h3>Camera (Optional)</h3>
+  <p>Click button to open camera (permission required).</p>
+
+  <button onclick="startCamera()">Open Camera</button><br><br>
+  <video id="video" width="300" autoplay></video><br>
+  <button onclick="takePhoto()">Take Photo</button><br><br>
+  <canvas id="canvas" width="300" height="200"></canvas>
+
+  <p class="note">
     This page is for public awareness only.
   </p>
-</body>
-</html>
-<button onclick="takePhoto()">Take Photo</button>
+</div>
 
 <script>
-async function takePhoto() {
-  const video = document.createElement('video');
-  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-  video.srcObject = stream;
-  video.play();
-  document.body.appendChild(video);
+let stream;
 
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
+async function startCamera() {
+  stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  document.getElementById("video").srcObject = stream;
+}
 
-  setTimeout(() => {
-    context.drawImage(video, 0, 0, 300, 200);
-    const img = document.createElement('img');
-    img.src = canvas.toDataURL('image/png');
-    document.body.appendChild(img);
-    stream.getTracks().forEach(track => track.stop());
-    video.remove();
-  }, 3000); // 3 seconds delay
+function takePhoto() {
+  const video = document.getElementById("video");
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 }
 </script>
+
+</body>
+</html>
